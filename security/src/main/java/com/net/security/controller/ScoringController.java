@@ -75,14 +75,12 @@ public class ScoringController {
                     map.put(index.getName(),"no");
                 }
             }
-            List<Score> scores=scoremanService.getAllbycuid(ct.getId(),userid);
+            List<Score> scores=scoremanService.getAllby3id(ct.getId(),setService.getsetid(),userid);
             for(Score ss:scores){
                 String index3name = index1Service.get3nameByid(ss.getIndex3id());
                 map.put(index3name,ss.getScore());
             }
             finalmap.add(map);
-
-
         }
         return new JsonResult<>(ResultCode.SUCCESS,finalmap);
 
@@ -92,6 +90,7 @@ public class ScoringController {
     @PostMapping("undo")
     @Transactional
     public JsonResult delete(@RequestBody Deindex deindex){
+        int userid=1;
         int counid=countryService.getidbyname(deindex.getCountry());
         List<Integer> index2=index1Service.get2idbyparent(counid);
         List<Integer> index3id=new ArrayList<>();
@@ -100,7 +99,7 @@ public class ScoringController {
             index3id.addAll(index3);
         }
         for(int i:index3id){
-            scoremanService.updateisscored(counid,i);
+            scoremanService.updateisscored(counid,i,setService.getsetid(),userid);
         }
         return new JsonResult<>(ResultCode.SUCCESS,true);
 

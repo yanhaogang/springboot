@@ -13,13 +13,13 @@ public class ScoremanServiceimpl implements ScoremanService {
     private ScoremanMapper scoremanMapper;
 
     @Override
-    public List<Score> getAllbycuid(int arg0, int arg1) {
-        return scoremanMapper.getAllbycauid(arg0,arg1);
+    public List<Score> getAllby3id(int arg0, int arg1,int arg2) {
+        return scoremanMapper.getAllby3id(arg0,arg1,arg2);
     }
 
     @Override
-    public void updateisscored(int arg0, int arg1) {
-        scoremanMapper.updateisscored(arg0,arg1);
+    public void updateisscored(int arg0, int arg1,int arg2,int arg3) {
+        scoremanMapper.updateisscored(arg0,arg1,arg2,arg3);
     }
 
 

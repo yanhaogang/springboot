@@ -3,6 +3,7 @@ package com.net.security.controller;
 import com.net.security.bean.Score;
 import com.net.security.service.Index1Service;
 import com.net.security.service.ScoremanService;
+import com.net.security.service.SetService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,8 @@ public class TestController {
     private Index1Service index1Service;
     @Autowired
     private ScoremanService scoremanService;
+    @Autowired
+    private SetService setService;
     @GetMapping("/")
     public String test(){
         return "hello";
@@ -29,6 +32,16 @@ public class TestController {
         score.setScore(2);
         score.setIsscored(1);
         scoremanService.insertscoreman(score);
+    }
+    @GetMapping("testset")
+    public Object TestSet(){
+        if(setService.getsetid()!=null){
+            return setService.getsetid();
+        }else{
+            return true;
+        }
+
+
     }
 
 

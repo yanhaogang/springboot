@@ -78,7 +78,7 @@
 	</dependencies>
 
 	<build>
-        <finalName>security3</finalName>
+        <finalName>security4</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

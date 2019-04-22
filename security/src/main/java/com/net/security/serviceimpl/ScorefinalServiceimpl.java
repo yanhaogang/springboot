@@ -20,6 +20,11 @@ public class ScorefinalServiceimpl implements ScorefinalService {
     }
 
     @Override
+    public Integer getIsscorcedBy4id(int arg0, int arg1, int arg2, int arg3) {
+        return scorefinalMapper.getIsscoredBy4id(arg0,arg1,arg2,arg3);
+    }
+
+    @Override
     public List<Score> getAllbycounid(int arg0, int arg1,int arg2) {
         return scorefinalMapper.getAllscorebyCounid(arg0,arg1,arg2);
     }

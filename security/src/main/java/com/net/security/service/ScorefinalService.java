@@ -7,4 +7,5 @@ import java.util.List;
 public interface ScorefinalService {
     Object getAll();
     List<Score> getAllbycounid(int arg0,int arg1,int arg2);
+    Integer getIsscorcedBy4id(int arg0,int arg1,int arg2,int arg3);
 }

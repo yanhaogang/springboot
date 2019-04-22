@@ -30,4 +30,8 @@ public interface ScorefinalMapper {
             @Result(column = "user_id",property = "userid")
     })
     List<Score> getAllscorebyCounid(int arg0,int arg1,int arg2);
+    @Select("select is_scored from score_final where index3_id=#{arg0} and coun_id=#{arg1} and user_id=#{arg2} and set_id=#{arg3}")
+    Integer getIsscoredBy4id(int arg0,int arg1,int arg2,int arg3);
+
+
 }
