@@ -11,4 +11,5 @@ public interface ScoremanService {
     void insertscoreman(Score score);
     Integer getIsscorcedBy4id(int arg0,int arg1,int arg2,int arg3);
     Integer getScoreBy4id(int arg0,int arg1,int arg2,int arg3);
+    List<Score> getAllbycisid(int arg0,int arg1,int arg2);
 }

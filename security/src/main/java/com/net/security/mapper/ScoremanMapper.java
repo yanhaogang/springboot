@@ -26,5 +26,14 @@ public interface ScoremanMapper {
     void insertscoreman(Score score);
     @Select("select score from score_man where coun_id=#{arg0} and index3_id=#{arg1} and set_id=#{arg2} and user_id=#{arg3}")
     Integer getScoreBy4id(int arg0,int arg1,int arg2,int arg3);
+    @Select("select * from score_man where coun_id=#{arg0} and index3_id=#{arg1} and set_id=#{arg2} and is_scored=1")
+    @Results({
+            @Result(column = "coun_id",property = "counid"),
+            @Result(column = "index3_id",property = "index3id"),
+            @Result(column = "set_id",property = "setid"),
+            @Result(column = "is_scored",property = "isscored"),
+            @Result(column = "user_id",property = "userid")
+    })
+    List<Score> getAllbycisid(int arg0,int arg1,int arg2);
 
 }

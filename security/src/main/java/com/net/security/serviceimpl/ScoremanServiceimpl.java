@@ -28,6 +28,10 @@ public class ScoremanServiceimpl implements ScoremanService {
         scoremanMapper.insertscoreman(score);
     }
 
+    @Override
+    public List<Score> getAllbycisid(int arg0, int arg1, int arg2) {
+        return scoremanMapper.getAllbycisid(arg0,arg1,arg2);
+    }
 
     @Override
     public Integer getIsscorcedBy4id(int arg0, int arg1, int arg2,int arg3) {

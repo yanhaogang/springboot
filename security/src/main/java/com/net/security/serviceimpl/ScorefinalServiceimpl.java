@@ -25,6 +25,16 @@ public class ScorefinalServiceimpl implements ScorefinalService {
     }
 
     @Override
+    public void updateIsscored(int arg0, int arg1, int arg2, int arg3) {
+        scorefinalMapper.updateisscored(arg0,arg1,arg2,arg3);
+    }
+
+    @Override
+    public void InsertScore(Score score) {
+        scorefinalMapper.insertscorefinal(score);
+    }
+
+    @Override
     public List<Score> getAllbycounid(int arg0, int arg1,int arg2) {
         return scorefinalMapper.getAllscorebyCounid(arg0,arg1,arg2);
     }

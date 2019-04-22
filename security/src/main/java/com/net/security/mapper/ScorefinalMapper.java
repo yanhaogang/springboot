@@ -32,6 +32,9 @@ public interface ScorefinalMapper {
     List<Score> getAllscorebyCounid(int arg0,int arg1,int arg2);
     @Select("select is_scored from score_final where index3_id=#{arg0} and coun_id=#{arg1} and user_id=#{arg2} and set_id=#{arg3}")
     Integer getIsscoredBy4id(int arg0,int arg1,int arg2,int arg3);
-
+    @Insert("insert into score_man (coun_id,index3_id,set_id,score,is_scored,user_id) values(#{counid},#{index3id},#{setid},#{score},#{isscored},#{userid})")
+    void insertscorefinal(Score score);
+    @Update("update score_final set score=0,is_scored=0 where coun_id=#{arg0} and index3_id=#{arg1} and set_id=#{arg2} and user_id=#{arg3}")
+    void updateisscored(int arg0,int arg1,int arg2,int arg3);
 
 }
