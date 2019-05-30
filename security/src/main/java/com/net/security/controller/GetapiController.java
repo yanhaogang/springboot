@@ -2,14 +2,9 @@ package com.net.security.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.net.security.bean.Country;
-import com.net.security.bean.Finalscore;
-import com.net.security.bean.Index;
-import com.net.security.bean.Score;
-import com.net.security.service.CountryService;
-import com.net.security.service.Index1Service;
-import com.net.security.service.OrgService;
-import com.net.security.service.ScorefinalService;
+import com.net.security.bean.*;
+import com.net.security.service.*;
+import com.net.security.utils.FloatSolve;
 import com.net.security.utils.JsonResult;
 import com.net.security.utils.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +26,10 @@ public class GetapiController {
     private ScorefinalService scorefinalService;
     @Autowired
     private Index1Service index1Service;
+    @Autowired
+    private SetService setService;
+    @Autowired
+    private CtooService ctooService;
     private Finalscore finalscore;
 
     @GetMapping("countries")
@@ -65,13 +64,15 @@ public class GetapiController {
     public Object finalscores(){
         List<Country> countrys=new ArrayList<>();
         String continent=null;
-        int counid=0,userid=1,setid=1;
+        int counid=0,userid=1;
+        int setid=setService.getsetid();
+        HashSet<String> cnentset=new HashSet<>();
         List<Score> scores;
         List<Finalscore> finalscores=new ArrayList<>();
         float score=0;
-        float weights1 = 0;
         countrys=countryService.getAll();
         for(Country ct:countrys){
+            cnentset.add(ct.getContinent());
             //二级指标对应的分数
             LinkedHashMap<Integer,Float> hashMap2=new LinkedHashMap<>();
             //一级指标对应的分数
@@ -80,7 +81,12 @@ public class GetapiController {
             finalscore.setCountry(ct.getName());
             finalscore.setContinent(ct.getContinent());
             counid=ct.getId();
+
+//            long startTime=System.currentTimeMillis();
             scores=scorefinalService.getAllbycounid(counid,userid,setid);
+//            long endTime=System.currentTimeMillis();
+//            System.out.println("当前数据库操作耗时："+(endTime-startTime)+"ms");
+
             for(Score score1:scores){
                 Index index=  index1Service.get3byid(score1.getIndex3id());
                 if(hashMap2.containsKey(index.getParent())){
@@ -91,32 +97,106 @@ public class GetapiController {
                 }
 
             }
+//            long startTime1=System.nanoTime();
             for(Map.Entry<Integer,Float> entry:hashMap2.entrySet()){
                 Index index2=index1Service.get2byid(entry.getKey());
+
                 if(hashMap1.containsKey(index2.getParent())){
                     float ind1=hashMap1.get(index2.getParent());
-                    hashMap1.put(index2.getParent(),ind1+index2.getWeight()*entry.getValue());
+                    hashMap1.put(index2.getParent(),new FloatSolve().transfloat(ind1+index2.getWeight()*entry.getValue()));
                 }else {
-                    hashMap1.put(index2.getParent(), index2.getWeight() * entry.getValue());
+                    hashMap1.put(index2.getParent(), new FloatSolve().transfloat(index2.getWeight() * entry.getValue()));
                 }
             }
+//            long endTime1=System.nanoTime();
+//            System.out.println("当前计算操作耗时："+(endTime1-startTime1)+"ns");
             score=0;
-
             for(Map.Entry<Integer,Float> entry1:hashMap1.entrySet()){
                 Index index1=index1Service.get1byid(entry1.getKey());
-                if(index1.getName().equals("legal")) finalscore.setLegal(entry1.getValue());
+                if(index1.getName().equals("strategy")) finalscore.setStrategy(entry1.getValue());
                 if(index1.getName().equals("technical")) finalscore.setTechnical(entry1.getValue());
-                if(index1.getName().equals("organization")) finalscore.setOrganization(entry1.getValue());
+                if(index1.getName().equals("industry")) finalscore.setIndustry(entry1.getValue());
                 if(index1.getName().equals("capacity")) finalscore.setCapacity(entry1.getValue());
-                if(index1.getName().equals("cooperation")) finalscore.setCooperation(entry1.getValue());
+                if(index1.getName().equals("resources")) finalscore.setResources(entry1.getValue());
                 score+=index1.getWeight()*entry1.getValue();
             }
-            finalscore.setScore(score);
+            finalscore.setScore(new FloatSolve().transfloat(score));
             finalscores.add(finalscore);
             
         }
+        List<Finalscore> totallists=new ArrayList<>();
+        for(String s:cnentset){
+            Finalscore cnent=new Finalscore();
+            cnent.setCountry(s);
+            cnent.setContinent(s);
+            float finalscore=0,finallegal=0,finaltech=0,finalorg=0,finalcap=0,finalcoo=0;
+            int count=0;
+            for(Finalscore f:finalscores){
+                if((f.getContinent()).equals(s)){
+                    finalscore+=f.getScore();
+                    finallegal+=f.getStrategy();
+                    finaltech+=f.getTechnical();
+                    finalorg+=f.getIndustry();
+                    finalcap+=f.getCapacity();
+                    finalcoo+=f.getResources();
+                    count++;
+                }
+            }
+            cnent.setScore(new FloatSolve().transfloat(finalscore/count));
+            cnent.setStrategy(new FloatSolve().transfloat(finallegal/count));
+            cnent.setTechnical(new FloatSolve().transfloat(finaltech/count));
+            cnent.setIndustry(new FloatSolve().transfloat(finalorg/count));
+            cnent.setCapacity(new FloatSolve().transfloat(finalcap/count));
+            cnent.setResources(new FloatSolve().transfloat(finalcoo/count));
+            totallists.add(cnent);
+        }
+        List<Org> orglist=orgService.getAll();
+        for(Org org:orglist){
+            Finalscore orgg=new Finalscore();
+            orgg.setCountry(org.getName());
+            orgg.setContinent(org.getType());
+            List<String> couns=ctooService.getAllcByoid(org.getId());
+            HashSet<String> hashSet=new HashSet<>();
+            for(String a:couns){
+                hashSet.add(a);
+            }
+            float finalscore1=0,finallegal1=0,finaltech1=0,finalorg1=0,finalcap1=0,finalcoo1=0;
+            int count1=0;
+            for(Finalscore ff:finalscores){
+                if(hashSet.contains(ff.getCountry())){
+                    count1++;
+                    finalscore1+=ff.getScore();
+                    finallegal1+=ff.getStrategy();
+                    finaltech1+=ff.getTechnical();
+                    finalorg1+=ff.getIndustry();
+                    finalcap1+=ff.getCapacity();
+                    finalcoo1+=ff.getResources();
+                }
+            }
+            if(count1!=0) {
+                orgg.setScore(new FloatSolve().transfloat(finalscore1 / count1));
+                orgg.setStrategy(new FloatSolve().transfloat(finallegal1 / count1));
+                orgg.setTechnical(new FloatSolve().transfloat(finaltech1 / count1));
+                orgg.setIndustry(new FloatSolve().transfloat(finalorg1 / count1));
+                orgg.setCapacity(new FloatSolve().transfloat(finalcap1 / count1));
+                orgg.setResources(new FloatSolve().transfloat(finalcoo1 / count1));
+                totallists.add(orgg);
+            }else {
+                orgg.setScore(0);
+                orgg.setStrategy(0);
+                orgg.setTechnical(0);
+                orgg.setIndustry(0);
+                orgg.setCapacity(0);
+                orgg.setResources(0);
+                totallists.add(orgg);
+            }
 
-        return new JsonResult<>(ResultCode.SUCCESS, finalscores);
+        }
+        HashMap<String,List<Finalscore>> map =new HashMap<>();
+
+        map.put("countries",finalscores);
+        map.put("orgs",totallists);
+        return new JsonResult<>(ResultCode.SUCCESS, map);
     }
 
     //index三张表，国家名对应中英文
@@ -171,6 +251,10 @@ public class GetapiController {
 
 
         return new JsonResult<>(ResultCode.SUCCESS,fitose);
+    }
+    @GetMapping("scoreorgs")
+    public Object getScoreorgs(){
+        return null;
     }
 
 

@@ -1,10 +1,11 @@
 package com.net.security.bean;
 
-public class Org {
+public class Index1 {
     private Integer id;
     private String name;
     private String nickname;
-    private String type;
+    private float weight;
+    private String other;
 
     public Integer getId() {
         return id;
@@ -30,11 +31,19 @@ public class Org {
         this.nickname = nickname;
     }
 
-    public String getType() {
-        return type;
+    public float getWeight() {
+        return weight;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setWeight(float weight) {
+        this.weight = weight;
+    }
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
     }
 }

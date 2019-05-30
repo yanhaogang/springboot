@@ -36,20 +36,13 @@ public class ScorefinalController {
     @Transactional
     @PostMapping("submit")
     public JsonResult insertscore(@RequestBody Scoresadd scoresadd){
+        int setid=setService.getsetid();
         int counid=countryService.getidbyname(scoresadd.getCountry());
-        HashMap<String,Float> hashMap= (HashMap<String, Float>) scoresadd.getScores();
+        HashMap<String,Float> hashMap= scoresadd.getScores();
         int userid=1;
         for(Map.Entry<String,Float> entry:hashMap.entrySet()){
             int id=index1Service.get3idbyname(entry.getKey());
-
-            Score score=new Score();
-            score.setCounid(counid);
-            score.setIndex3id(id);
-            score.setSetid(setService.getsetid());
-            score.setScore(entry.getValue());
-            score.setIsscored(1);
-            score.setUserid(userid);
-            scorefinalService.InsertScore(score);
+            scorefinalService.updataScore(entry.getValue(),counid,id,setid,userid);
         }
         return new JsonResult<>(ResultCode.SUCCESS,true);
     }
@@ -58,7 +51,7 @@ public class ScorefinalController {
     public JsonResult Deletefinal(@RequestBody Deindex deindex){
         int counid=countryService.getidbyname(deindex.getCountry());
         int userid=1;
-        List<Integer> index2=index1Service.get2idbyparent(counid);
+        List<Integer> index2=index1Service.get2idbyparent(index1Service.get1idByname(deindex.getIndex()));
         List<Integer> index3id=new ArrayList<>();
         for(int id:index2){
             List<Integer> index3=index1Service.get3idbyparent(id);
@@ -81,19 +74,21 @@ public class ScorefinalController {
             for(Index id3:index3){
                 List<Score> scoreList=scoremanService.getAllbycisid(ct.getId(),id3.getId(),setService.getsetid());
                 //如果该指标没有评过分，则认为该指标无冲突
-                if(scoreList==null){
-                    map.put(id3.getName(),0);
-                }
-                float temp=scoreList.get(1).getScore();
-                flag=0;
-                for(Score ss:scoreList){
-                    if(temp!=ss.getScore()){
-                        map.put(id3.getName(),1);
-                        flag=1;
-                        break;
+                if(scoreList!=null&&scoreList.size()!=0){
+                    float temp = scoreList.get(0).getScore();
+                    flag = 0;
+                    for (Score ss : scoreList) {
+                        if (temp != ss.getScore()) {
+                            map.put(id3.getName(), 1);
+                            flag = 1;
+                            break;
+                        }
                     }
-                }
-                if(flag==0){
+                    if (flag == 0) {
+                        map.put(id3.getName(), 0);
+                    }
+
+                }else {
                     map.put(id3.getName(),0);
                 }
             }
@@ -110,7 +105,12 @@ public class ScorefinalController {
             List<Integer> temp = new ArrayList<>();
             List<Index> index2 = index1Service.get2Allbyparent(index.getId());
             for (Index ind : index2) {
-                temp.add(ind.getId());
+                List<Index> index3=index1Service.get3Allbyparent(ind.getId());
+                for(Index th:index3){
+                    int a=1;
+                    temp.add(th.getId());
+                }
+
             }
             finalmap.put(index.getId(), temp);
         }
@@ -151,52 +151,50 @@ public class ScorefinalController {
     }
     @GetMapping("detail")
     public Object getdetail(@RequestParam String country,String index){
-        int flag=0;
-        List<Index> index1 = index1Service.get1All();
-        LinkedHashMap<Integer, List<Integer>> finamap = new LinkedHashMap<>();
-        for (Index id1 : index1) {
-            List<Index> index2 = index1Service.get2Allbyparent(id1.getId());
-            List<Integer> tp = new ArrayList<>();
-            for (Index ind : index2) {
-                tp.add(ind.getId());
-            }
-            finamap.put(id1.getId(), tp);
-        }
+        int flag;
         int counid=countryService.getidbyname(country);
-        List<Integer> inde3=finamap.get(index1Service.get3idbyname(index));
+        int index1id=index1Service.get1idByname(index);
+        List<Integer> index2=index1Service.get2idbyparent(index1id);
+        List<Integer> final3id=new ArrayList<>();
+        for(Integer i:index2){
+            List<Integer> index3=index1Service.get3idbyparent(i);
+            final3id.addAll(index3);
+        }
         List<Detail> details=new ArrayList<>();
-        for(Integer n:inde3){
-            flag=0;
-            StringBuffer linshi=new StringBuffer();
-            Detail detail=new Detail();
-            List<Score> list=scoremanService.getAllbycisid(counid,n,setService.getsetid());
-            if(list==null){
-                detail.setIndex(index1Service.get3nameByid(n));
-                detail.setStatus("无评分");
-                detail.setScore(0);
-            }else{
-                float temp=list.get(0).getScore();
-                for(Score sc:list){
-                    if(temp!=sc.getScore()){
-                        flag=1;
-                        break;
+        for (Integer n : final3id) {
+            flag = 0;
+            StringBuffer linshi = new StringBuffer();
+            Detail detail = new Detail();
+            List<Score> list = scoremanService.getAllbycisid(counid, n, setService.getsetid());
+            if (list != null && list.size() != 0) {
+                float temp = list.get(0).getScore();
+                for (Score sc : list) {
+                    if (temp != sc.getScore()) {
+                        flag = 1;
                     }
-                    linshi.append("评分员"+sc.getUserid()+":"+sc.getScore()+",");
+                    linshi.append("评分员" + sc.getUserid() + ":" + sc.getScore() + ",");
                 }
-                if(flag==0){
+                if (flag == 0) {
                     detail.setIndex(index1Service.get3nameByid(n));
                     detail.setStatus("一致");
                     detail.setDetail(linshi.toString());
                     detail.setScore(temp);
-                }else {
+                } else {
                     detail.setIndex(index1Service.get3nameByid(n));
                     detail.setStatus("冲突");
                     detail.setDetail(linshi.toString());
                     detail.setScore(0);
                 }
+
+            } else{
+                detail.setIndex(index1Service.get3nameByid(n));
+                detail.setStatus("无评分");
+                detail.setDetail("");
+                detail.setScore(0);
             }
             details.add(detail);
         }
+
         return new JsonResult<>(ResultCode.SUCCESS,details);
     }
 

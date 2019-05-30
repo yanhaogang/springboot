@@ -3,18 +3,18 @@ package com.net.security.bean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class User {
-    private int id;
+    private Integer id;
     private String name;
     private String nickname;
     @JsonIgnore
     private String password;
     private int role;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

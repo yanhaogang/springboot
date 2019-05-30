@@ -1,9 +1,11 @@
 package com.net.security.bean;
 
+import java.util.HashMap;
+
 public class Scoresadd {
     private String country;
     private String index;
-    private Object scores;
+    private HashMap<String,Float> scores;
 
     public String getCountry() {
         return country;
@@ -21,11 +23,11 @@ public class Scoresadd {
         this.index = index;
     }
 
-    public Object getScores() {
+    public HashMap<String, Float> getScores() {
         return scores;
     }
 
-    public void setScores(Object scores) {
+    public void setScores(HashMap<String, Float> scores) {
         this.scores = scores;
     }
 }

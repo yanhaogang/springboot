@@ -1,10 +1,11 @@
 package com.net.security.bean;
 
-public class Org {
+public class Recieveuser {
     private Integer id;
     private String name;
     private String nickname;
-    private String type;
+    private String password;
+    private int role;
 
     public Integer getId() {
         return id;
@@ -30,11 +31,19 @@ public class Org {
         this.nickname = nickname;
     }
 
-    public String getType() {
-        return type;
+    public String getPassword() {
+        return password;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
     }
 }

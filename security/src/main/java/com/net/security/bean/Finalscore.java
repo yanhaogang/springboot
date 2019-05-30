@@ -3,11 +3,11 @@ package com.net.security.bean;
 public class Finalscore {
     private String country;
     private float score;
-    private float legal;
+    private float strategy;
     private float technical;
-    private float organization;
+    private float industry;
     private float capacity;
-    private float cooperation;
+    private float resources;
     private String continent;
 
     public String getCountry() {
@@ -26,13 +26,7 @@ public class Finalscore {
         this.score = score;
     }
 
-    public float getLegal() {
-        return legal;
-    }
 
-    public void setLegal(float legal) {
-        this.legal = legal;
-    }
 
     public float getTechnical() {
         return technical;
@@ -42,13 +36,7 @@ public class Finalscore {
         this.technical = technical;
     }
 
-    public float getOrganization() {
-        return organization;
-    }
 
-    public void setOrganization(float organization) {
-        this.organization = organization;
-    }
 
     public float getCapacity() {
         return capacity;
@@ -58,12 +46,28 @@ public class Finalscore {
         this.capacity = capacity;
     }
 
-    public float getCooperation() {
-        return cooperation;
+    public float getStrategy() {
+        return strategy;
     }
 
-    public void setCooperation(float cooperation) {
-        this.cooperation = cooperation;
+    public void setStrategy(float strategy) {
+        this.strategy = strategy;
+    }
+
+    public float getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(float industry) {
+        this.industry = industry;
+    }
+
+    public float getResources() {
+        return resources;
+    }
+
+    public void setResources(float resources) {
+        this.resources = resources;
     }
 
     public String getContinent() {

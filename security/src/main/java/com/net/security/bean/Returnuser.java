@@ -1,18 +1,9 @@
 package com.net.security.bean;
 
-public class Org {
-    private Integer id;
+public class Returnuser {
     private String name;
     private String nickname;
-    private String type;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    private int role;
 
     public String getName() {
         return name;
@@ -30,11 +21,11 @@ public class Org {
         this.nickname = nickname;
     }
 
-    public String getType() {
-        return type;
+    public int getRole() {
+        return role;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setRole(int role) {
+        this.role = role;
     }
 }

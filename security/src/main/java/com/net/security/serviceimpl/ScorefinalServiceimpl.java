@@ -25,6 +25,11 @@ public class ScorefinalServiceimpl implements ScorefinalService {
     }
 
     @Override
+    public void updataScore(float arg0, int arg1, int arg2, int arg3, int arg4) {
+        scorefinalMapper.updataScore(arg0,arg1,arg2,arg3,arg4);
+    }
+
+    @Override
     public void updateIsscored(int arg0, int arg1, int arg2, int arg3) {
         scorefinalMapper.updateisscored(arg0,arg1,arg2,arg3);
     }

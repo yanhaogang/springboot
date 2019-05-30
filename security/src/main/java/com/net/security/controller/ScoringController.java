@@ -1,5 +1,6 @@
 package com.net.security.controller;
 import com.net.security.bean.*;
+import com.net.security.bean.Set;
 import com.net.security.service.CountryService;
 import com.net.security.service.Index1Service;
 import com.net.security.service.ScoremanService;
@@ -31,7 +32,7 @@ public class ScoringController {
 
     @GetMapping("data")
     public Object finddata(){
-        int userid=1,setid=1;
+        int userid=1,setid=setService.getsetid();
         List<Index> first=new ArrayList<>();
         LinkedHashMap<Integer,List<Integer>> fitothird=new LinkedHashMap<>();
         first=index1Service.get1All();
@@ -75,7 +76,7 @@ public class ScoringController {
                     map.put(index.getName(),"no");
                 }
             }
-            List<Score> scores=scoremanService.getAllby3id(ct.getId(),setService.getsetid(),userid);
+            List<Score> scores=scoremanService.getAllby3id(ct.getId(),setid,userid);
             for(Score ss:scores){
                 String index3name = index1Service.get3nameByid(ss.getIndex3id());
                 map.put(index3name,ss.getScore());
@@ -92,7 +93,7 @@ public class ScoringController {
     public JsonResult delete(@RequestBody Deindex deindex){
         int userid=1;
         int counid=countryService.getidbyname(deindex.getCountry());
-        List<Integer> index2=index1Service.get2idbyparent(counid);
+        List<Integer> index2=index1Service.get2idbyparent(index1Service.get1idByname(deindex.getIndex()));
         List<Integer> index3id=new ArrayList<>();
         for(int id:index2){
             List<Integer> index3=index1Service.get3idbyparent(id);
@@ -108,22 +109,97 @@ public class ScoringController {
     @PostMapping("submit")
     @Transactional
     public JsonResult addScore(@RequestBody Scoresadd scoresadd){
+        int setid=setService.getsetid();
         int counid=countryService.getidbyname(scoresadd.getCountry());
-        HashMap<String,Float> hashMap= (HashMap<String, Float>) scoresadd.getScores();
+        HashMap<String,Float> hashMap=  scoresadd.getScores();
         for(Map.Entry<String,Float> entry:hashMap.entrySet()){
             int id=index1Service.get3idbyname(entry.getKey());
             int userid=1;
-            Score score=new Score();
-            score.setCounid(counid);
-            score.setIndex3id(id);
-            score.setScore(entry.getValue());
-            score.setSetid(setService.getsetid());
-            score.setIsscored(1);
-            score.setUserid(userid);
-            scoremanService.insertscoreman(score);
-
+            scoremanService.updataScore(entry.getValue(),counid,id,setid,userid);
         }
         return new JsonResult<>(ResultCode.SUCCESS,true);
     }
+    @PostMapping("choosesets")
+    @Transactional
+    public JsonResult chooseSet(@RequestBody Setid setid){
+        Integer id=setid.getId();
+        if(id==null){
+            return new JsonResult<>(ResultCode.WARN,false);
+        }else {
+            setService.to0Byid(setService.getsetid());
+            setService.to1Byid(id);
+            return new JsonResult<>(ResultCode.SUCCESS,true);
+        }
+    }
+    @PostMapping("editsets")
+    @Transactional
+    public JsonResult editSets(@RequestBody Set set){
+        if(set.getId()==null){
+            Set set1=new Set();
+            set1.setName(set.getName());
+            set1.setIsactive(0);
+            set1.setDate(new Date());
+            setService.insert(set1);
+        }else{
+            setService.updateByid(set.getName(),new Date(),set.getId());
+        }
+
+        return new JsonResult<>(ResultCode.SUCCESS,true);
+    }
+    @GetMapping("delsets")
+    @Transactional
+    public Object delSets(@RequestParam Integer id){
+        setService.deleteSetbyid(id);
+        return new JsonResult<>(ResultCode.SUCCESS,true);
+    }
+
+    /**
+     * 返回set表，带分页和搜索
+     * @param start
+     * @param limit
+     * @param search
+     * @return
+     */
+    @GetMapping("sets")
+    public JsonResult getAllset(@RequestParam Integer start, Integer limit, String search){
+        System.out.println(search.length());
+        if(search.length()>0){
+            Integer c0=setService.getNumBysearch(search);
+            Sets sets0=new Sets();
+            if(c0==null) {
+                sets0.setTotal(0);
+                sets0.setSets(null);
+                return new JsonResult<>(ResultCode.SUCCESS,sets0);
+            }else {
+                sets0.setTotal(c0);
+                if(start!=null&&limit!=null){
+                    sets0.setSets(setService.getPartBylike(search,start,limit));
+                    return new JsonResult<>(ResultCode.SUCCESS,sets0);
+                }else {
+                    sets0.setSets(setService.getAllBylike(search));
+                    return new JsonResult<>(ResultCode.SUCCESS,sets0);
+                }
+            }
+
+        }else{
+            Integer c1=setService.getNum();
+            Sets sets1=new Sets();
+            if(c1==null){
+                sets1.setTotal(0);
+                sets1.setSets(null);
+                return new JsonResult<>(ResultCode.SUCCESS,sets1);
+            }else{
+                sets1.setTotal(c1);
+                if(start!=null&&limit!=null){
+                    sets1.setSets(setService.getPart(start,limit));
+                    return new JsonResult<>(ResultCode.SUCCESS,sets1);
+                }else {
+                    sets1.setSets(setService.getAllset());
+                    return new JsonResult<>(ResultCode.SUCCESS,sets1);
+                }
+            }
+        }
+    }
+
 
 }

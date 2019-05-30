@@ -5,15 +5,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 public class Country {
-    private int id;
+    private Integer id;
     private String name;
     private String nickname;
-    @JsonFormat(pattern="yyyy-MM-dd",locale="zh",timezone="GMT+8")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date est;
     private String language;
     private String capital;
-    private float population;
-    private float area;
+    private Float population;
+    private Float area;
     private String economy;
     private String other;
     private String continent;
@@ -26,11 +26,11 @@ public class Country {
         this.continent = continent;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -74,19 +74,19 @@ public class Country {
         this.capital = capital;
     }
 
-    public float getPopulation() {
+    public Float getPopulation() {
         return population;
     }
 
-    public void setPopulation(float population) {
+    public void setPopulation(Float population) {
         this.population = population;
     }
 
-    public float getArea() {
+    public Float getArea() {
         return area;
     }
 
-    public void setArea(float area) {
+    public void setArea(Float area) {
         this.area = area;
     }
 

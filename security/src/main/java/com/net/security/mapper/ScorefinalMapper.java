@@ -34,7 +34,10 @@ public interface ScorefinalMapper {
     Integer getIsscoredBy4id(int arg0,int arg1,int arg2,int arg3);
     @Insert("insert into score_man (coun_id,index3_id,set_id,score,is_scored,user_id) values(#{counid},#{index3id},#{setid},#{score},#{isscored},#{userid})")
     void insertscorefinal(Score score);
-    @Update("update score_final set score=0,is_scored=0 where coun_id=#{arg0} and index3_id=#{arg1} and set_id=#{arg2} and user_id=#{arg3}")
+    @Update("update score_final set is_scored=0 where coun_id=#{arg0} and index3_id=#{arg1} and set_id=#{arg2} and user_id=#{arg3}")
     void updateisscored(int arg0,int arg1,int arg2,int arg3);
+
+    @Update("update score_final set score=#{arg0},is_scored=1 where coun_id=#{arg1} and index3_id=#{arg2} and set_id=#{arg3} and user_id=#{arg4}")
+    void updataScore(float arg0,int arg1,int arg2,int arg3,int arg4);
 
 }

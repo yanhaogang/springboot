@@ -10,4 +10,5 @@ public interface ScorefinalService {
     Integer getIsscorcedBy4id(int arg0,int arg1,int arg2,int arg3);
     void InsertScore(Score score);
     void updateIsscored(int arg0,int arg1,int arg2,int arg3);
+    void updataScore(float arg0,int arg1,int arg2,int arg3,int arg4);
 }

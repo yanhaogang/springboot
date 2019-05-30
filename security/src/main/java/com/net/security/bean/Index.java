@@ -1,18 +1,18 @@
 package com.net.security.bean;
 
 public class Index {
-    private int id;
+    private Integer id;
     private String name;
     private String nickname;
     private float weight;
     private String other;
-    private int parent;
+    private Integer parent;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -48,11 +48,11 @@ public class Index {
         this.other = other;
     }
 
-    public int getParent() {
+    public Integer getParent() {
         return parent;
     }
 
-    public void setParent(int parent) {
+    public void setParent(Integer parent) {
         this.parent = parent;
     }
 }

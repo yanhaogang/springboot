@@ -1,18 +1,21 @@
 package com.net.security.bean;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class Set {
-    private int id;
+    private Integer id;
     private String name;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date date;
     private int isactive;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -44,6 +44,11 @@ public class ScoremanServiceimpl implements ScoremanService {
     }
 
     @Override
+    public void updataScore(float arg0, int arg1, int arg2, int arg3, int arg4) {
+        scoremanMapper.updataScore(arg0,arg1,arg2,arg3,arg4);
+    }
+
+    @Override
     public Integer getScoreBy4id(int arg0, int arg1, int arg2, int arg3) {
         return scoremanMapper.getScoreBy4id(arg0,arg1,arg2,arg3);
     }
