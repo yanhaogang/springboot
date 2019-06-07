@@ -139,7 +139,30 @@ public class ScoringController {
             set1.setName(set.getName());
             set1.setIsactive(0);
             set1.setDate(new Date());
-            setService.insert(set1);
+            int setid=setService.insert(set1);
+//            List<Index> index3list=index1Service.get3All();
+//            List<Country> countryList=countryService.getAll();
+//            for(Index ind:index3list){
+//                for(Country country:countryList){
+//                    //message为表名
+//                    List<String> content=messageService.getcontentByci(country.getId(),ind.getId());
+//                    if(content==null){
+//                        Scoreauto scoreauto=new Scoreauto();
+//                        scoreauto.setCounid(counid);
+//                        scoreauto.setIndex3id(index3id);
+//                        scoreauto.setSetid(setid);
+//                        scoreauto.setScore(0);
+//                        scoreautoService.insert(scoreauto);
+//                    }else{
+//                        Scoreauto scoreauto=new Scoreauto();
+//                        scoreauto.setCounid(counid);
+//                        scoreauto.setIndex3id(index3id);
+//                        scoreauto.setSetid(setid);
+//                        scoreauto.setScore(1);
+//                        scoreautoService.insert(scoreauto);
+//                    }
+//                }
+//            }
         }else{
             setService.updateByid(set.getName(),new Date(),set.getId());
         }

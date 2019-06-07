@@ -26,6 +26,8 @@ public class ScorefinalController {
     private Index1Service index1Service;
     @Autowired
     private SetService setService;
+    @Autowired
+    private ReferenceService referenceService;
 
     @Autowired
     private ScorefinalService scorefinalService;
@@ -89,7 +91,7 @@ public class ScorefinalController {
                     }
 
                 }else {
-                    map.put(id3.getName(),0);
+                    map.put(id3.getName(),1);
                 }
             }
             result.add(map);
@@ -197,7 +199,22 @@ public class ScorefinalController {
 
         return new JsonResult<>(ResultCode.SUCCESS,details);
     }
-
+    /**
+     *根据国家和三级指标返回对应评分依据
+     */
+    @PostMapping("reference")
+    public Object getContent(@RequestParam String country,String index3){
+        List<Reference> references=referenceService.getBycandi(country,index3);
+        if(references==null) return null;
+        List<Classhelp> classhelps=new ArrayList<>();
+        for (Reference reference:references){
+            Classhelp classhelp=new Classhelp();
+            classhelp.setEn(reference.getContent());
+            classhelp.setCn(reference.getContentcn());
+            classhelps.add(classhelp);
+        }
+        return new JsonResult<>(ResultCode.SUCCESS,classhelps);
+    }
 
 
 }

@@ -12,7 +12,7 @@ public interface SetService {
     void to1Byid(int id);
     void to0Byid(int id);
     void updateByid(String arg0,  Date arg1,  int arg2);
-    void insert(Set set);
+    int insert(Set set);
     List<Set> getPartBylike(String arg0,int arg1,int arg2);
     Integer getNumBysearch(String _parameter);
     Integer getNum();

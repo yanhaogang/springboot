@@ -28,7 +28,7 @@ public interface SetMapper {
 
     @Insert("INSERT INTO aset(name,set_date,is_active) VALUES(#{name},#{date},#{isactive})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insert(Set set);
+    int insert(Set set);
     @Select("select * from aset where name like '%${arg0}%' limit ${arg1},${arg2}")
     @Results({
             @Result(column = "set_date",property = "date"),
