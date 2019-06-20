@@ -7,6 +7,7 @@ import com.net.security.service.UserService;
 import com.net.security.utils.JsonResult;
 import com.net.security.utils.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -45,7 +46,7 @@ public class UserController {
                 return new JsonResult<>(ResultCode.FALSE,"密码错误！");
             }else {
                 int id=userService.getBynp(name,password).getId();
-                Cookie cookie=new Cookie("user",String.valueOf(id));
+                Cookie cookie=new Cookie("userid",String.valueOf(id));
                 response.addCookie(cookie);
                 cookie.setMaxAge(60*60*24);
                 Returnuser returnuser=new Returnuser();
@@ -56,5 +57,11 @@ public class UserController {
                 return new JsonResult<>(ResultCode.SUCCESS,returnuser);
             }
         }
+    }
+    @PostMapping("password")
+    @Transactional
+    public Object UpdatePd(@RequestBody Reciveuser reciveuser,@CookieValue("userid") String id){
+        userService.updatePD(reciveuser.getPassword(),Integer.parseInt(id));
+        return new JsonResult<>(ResultCode.SUCCESS,"密码修改成功！");
     }
 }

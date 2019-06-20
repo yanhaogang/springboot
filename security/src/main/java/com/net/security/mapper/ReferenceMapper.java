@@ -15,5 +15,4 @@ public interface ReferenceMapper {
     })
     List<Reference> getBycandi(String arg0,String arg1);
 
-
 }

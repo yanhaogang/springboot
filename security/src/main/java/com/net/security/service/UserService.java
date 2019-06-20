@@ -22,5 +22,6 @@ public interface UserService {
 
     List<User> getByname(String name);
     User getBynp(String arg0,String arg1);
+    void updatePD(String arg0,int arg1);
 
 }

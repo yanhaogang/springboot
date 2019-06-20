@@ -18,6 +18,8 @@ public interface UserMapper {
 
     @Update("update user set nickname=#{arg0},role=#{arg1} where id=#{arg2}")
     void updatenameByid(String arg0,int arg1,int arg2);
+    @Update("update user set password=#{arg0} where id=#{arg1}")
+    void updatePD(String arg0,int arg1);
 
 
 

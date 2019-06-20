@@ -8,9 +8,8 @@ import com.net.security.utils.FloatSolve;
 import com.net.security.utils.JsonResult;
 import com.net.security.utils.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.*;
 
 
@@ -61,10 +60,9 @@ public class GetapiController {
     }
 
     @GetMapping("scores")
-    public Object finalscores(){
-        List<Country> countrys=new ArrayList<>();
-        String continent=null;
-        int counid=0,userid=1;
+    public Object finalscores(@CookieValue("userid") String userid){
+        List<Country> countrys;
+        int counid;
         int setid=setService.getsetid();
         HashSet<String> cnentset=new HashSet<>();
         List<Score> scores;
@@ -81,12 +79,7 @@ public class GetapiController {
             finalscore.setCountry(ct.getName());
             finalscore.setContinent(ct.getContinent());
             counid=ct.getId();
-
-//            long startTime=System.currentTimeMillis();
-            scores=scorefinalService.getAllbycounid(counid,userid,setid);
-//            long endTime=System.currentTimeMillis();
-//            System.out.println("当前数据库操作耗时："+(endTime-startTime)+"ms");
-
+            scores=scorefinalService.getAllbycounid(counid,Integer.parseInt(userid),setid);
             for(Score score1:scores){
                 Index index=  index1Service.get3byid(score1.getIndex3id());
                 if(hashMap2.containsKey(index.getParent())){
@@ -97,7 +90,6 @@ public class GetapiController {
                 }
 
             }
-//            long startTime1=System.nanoTime();
             for(Map.Entry<Integer,Float> entry:hashMap2.entrySet()){
                 Index index2=index1Service.get2byid(entry.getKey());
 
@@ -108,8 +100,7 @@ public class GetapiController {
                     hashMap1.put(index2.getParent(), new FloatSolve().transfloat(index2.getWeight() * entry.getValue()));
                 }
             }
-//            long endTime1=System.nanoTime();
-//            System.out.println("当前计算操作耗时："+(endTime1-startTime1)+"ns");
+
             score=0;
             for(Map.Entry<Integer,Float> entry1:hashMap1.entrySet()){
                 Index index1=index1Service.get1byid(entry1.getKey());
@@ -256,7 +247,6 @@ public class GetapiController {
     public Object getScoreorgs(){
         return null;
     }
-
 
 
 

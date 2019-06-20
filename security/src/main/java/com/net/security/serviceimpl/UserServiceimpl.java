@@ -34,6 +34,11 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
+    public void updatePD(String arg0, int arg1) {
+        userMapper.updatePD(arg0,arg1);
+    }
+
+    @Override
     public Object findall() {
         return userMapper.getAll();
     }
