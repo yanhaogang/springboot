@@ -68,34 +68,36 @@ public class ScoringController {
         List<LinkedHashMap<String,Object>> finalmap=new ArrayList<>();
         for(Country ct:countries){
             LinkedHashMap<String,Object> map=new LinkedHashMap<>();
-            map.put("country",ct.getName());
+            int flag1=0;
             for(Index index:index1){
                 int flag=0;
                 List<Integer> ontthree=fitothird.get(index.getId());
-                if(ontthree==null){
+                if(ontthree.size()==0){
                     map.put(index.getName(),"no");
                 }else{
                     for(Integer num:ontthree){
-                        if(scoremanService.getIsscorcedBy4id(num,ct.getId(),userid,setid)!=null&&scoremanService.getIsscorcedBy4id(num,ct.getId(),userid,setid)==1){
+                        if(scoremanService.getIsscorcedBy4id(num,ct.getId(),userid,setid)!=1){
+                            int nouse=0;
                             flag = 1;
                             break;
-
                         }
                     }
 
                 }
-                if(flag==1){
+                if(flag==0){
                     map.put(index.getName(),"yes");
                 }else {
                     map.put(index.getName(),"no");
                 }
             }
+            map.put("country",ct.getName());
             List<Score> scores=scoremanService.getAllby3id(ct.getId(),setid,userid);
             for(Score ss:scores){
                 String index3name = index1Service.get3nameByid(ss.getIndex3id());
                 map.put(index3name,ss.getScore());
             }
             finalmap.add(map);
+
         }
         return new JsonResult<>(ResultCode.SUCCESS,finalmap);
 

@@ -43,4 +43,15 @@ public class ScorefinalServiceimpl implements ScorefinalService {
     public List<Score> getAllbycounid(int arg0, int arg1,int arg2) {
         return scorefinalMapper.getAllscorebyCounid(arg0,arg1,arg2);
     }
+
+    @Override
+    public List<Score> getAllBy2id(int arg0, int arg1) {
+        return scorefinalMapper.getAllBy2id(arg0,arg1);
+    }
+
+    @Override
+    public void deleteBy2id(int arg0, int arg1) {
+        scorefinalMapper.deleteBy2id(arg0,arg1);
+    }
+
 }

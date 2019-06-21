@@ -192,7 +192,7 @@ public class GetapiController {
             map.put("sets",set.getName());
             for(String c:countryList){
                 if(archiveService.getBy3(set.getId(),c,index1id)==null){
-                    map.put(c,"无评分");
+                    map.put(c,0);
                 }else {
                     map.put(c, archiveService.getBy3(set.getId(), c, index1id).getScore());
                 }

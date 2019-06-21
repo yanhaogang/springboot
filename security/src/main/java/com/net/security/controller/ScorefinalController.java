@@ -49,11 +49,11 @@ public class ScorefinalController {
     }
     @Transactional
     @PostMapping("submit")
-    public JsonResult insertscore(@RequestBody Scoresadd scoresadd){
+    public JsonResult insertscore(@RequestBody Scoresadd scoresadd ,@CookieValue("userid") String id1){
         int setid=setService.getsetid();
         int counid=countryService.getidbyname(scoresadd.getCountry());
         HashMap<String,Float> hashMap= scoresadd.getScores();
-        int userid=1;
+        int userid=Integer.parseInt(id1);
         for(Map.Entry<String,Float> entry:hashMap.entrySet()){
             int id=index1Service.get3idbyname(entry.getKey());
             scorefinalService.updataScore(entry.getValue(),counid,id,setid,userid);
@@ -62,9 +62,9 @@ public class ScorefinalController {
     }
     @Transactional
     @PostMapping("undo")
-    public JsonResult Deletefinal(@RequestBody Deindex deindex){
+    public JsonResult Deletefinal(@RequestBody Deindex deindex,@CookieValue("userid") String id1){
         int counid=countryService.getidbyname(deindex.getCountry());
-        int userid=1;
+        int userid=Integer.parseInt(id1);
         List<Integer> index2=index1Service.get2idbyparent(index1Service.get1idByname(deindex.getIndex()));
         List<Integer> index3id=new ArrayList<>();
         for(int id:index2){
@@ -111,8 +111,8 @@ public class ScorefinalController {
         return new JsonResult<>(ResultCode.SUCCESS,result);
     }
     @GetMapping("data")
-    public Object getAlldata() {
-        Integer setid = setService.getsetid(), userid = 1;
+    public Object getAlldata(@CookieValue("userid") String id) {
+        Integer setid = setService.getsetid(), userid = Integer.parseInt(id);
         List<Index> index1 = index1Service.get1All();
         LinkedHashMap<Integer, List<Integer>> finalmap = new LinkedHashMap<>();
         for (Index index : index1) {
@@ -132,34 +132,33 @@ public class ScorefinalController {
         List<LinkedHashMap<String, Object>> scorefinalmap = new ArrayList<>();
         for (Country ct : countries) {
             LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-            map.put("country", ct.getName());
             for (Index i : index1) {
+                //flag为1表示某一大指标没有评分
                 int flag = 0;
                 List<Integer> threeofone = finalmap.get(i.getId());
-                if (threeofone == null) {
+                if (threeofone.size()==0) {
                     map.put(i.getName(), "no");
                 } else {
                     for (Integer n : threeofone) {
-                        if (scorefinalService.getIsscorcedBy4id(n, ct.getId(), userid, setid) != null) {
-                            if (scorefinalService.getIsscorcedBy4id(n, ct.getId(), userid, setid) == 1) {
-                                flag = 1;
-                                break;
-                            }
+                        if(scorefinalService.getIsscorcedBy4id(n,ct.getId(),userid,setid)!=1){
+                            flag=1;
+                            break;
                         }
-
                     }
                 }
                 if (flag == 1) {
-                    map.put(i.getName(), "yes");
-                } else {
                     map.put(i.getName(), "no");
+                } else {
+                    map.put(i.getName(), "yes");
                 }
             }
+            map.put("country", ct.getName());
             List<Score> scores = scorefinalService.getAllbycounid(ct.getId(), userid, setid);
             for (Score s : scores) {
                 map.put((index1Service.get3nameByid(s.getIndex3id())), s.getScore());
             }
             scorefinalmap.add(map);
+
         }
         return new JsonResult<>(ResultCode.SUCCESS, scorefinalmap);
     }
@@ -180,6 +179,8 @@ public class ScorefinalController {
             StringBuffer linshi = new StringBuffer();
             Detail detail = new Detail();
             List<Score> list = scoremanService.getAllbycisid(counid, n, setService.getsetid());
+            detail.setIndex(index1Service.get3nameByid(n));
+            detail.setIndexname(index1Service.get3nicknameByid(n));
             if (list != null && list.size() != 0) {
                 float temp = list.get(0).getScore();
                 for (Score sc : list) {
@@ -188,22 +189,15 @@ public class ScorefinalController {
                     }
                     linshi.append("评分员" + sc.getUserid() + ":" + sc.getScore() + ",");
                 }
+                detail.setDetail(linshi.toString());
                 if (flag == 0) {
-                    detail.setIndex(index1Service.get3nameByid(n));
-                    detail.setIndexname(index1Service.get3nicknameByid(n));
                     detail.setStatus("一致");
-                    detail.setDetail(linshi.toString());
                     detail.setScore(temp);
                 } else {
-                    detail.setIndex(index1Service.get3nameByid(n));
-                    detail.setIndexname(index1Service.get3nicknameByid(n));
                     detail.setStatus("冲突");
-                    detail.setDetail(linshi.toString());
                     detail.setScore(0);
                 }
-
             } else{
-                detail.setIndex(index1Service.get3nameByid(n));
                 detail.setStatus("无评分");
                 detail.setDetail("");
                 detail.setScore(0);
@@ -229,6 +223,7 @@ public class ScorefinalController {
         List<Classhelp> classhelps=new ArrayList<>();
         for (Reference reference:references){
             Classhelp classhelp=new Classhelp();
+            classhelp.setId(reference.getId());
             classhelp.setEn(reference.getContent());
             classhelp.setCn(reference.getContentcn());
             classhelps.add(classhelp);
@@ -540,6 +535,53 @@ public class ScorefinalController {
                 archiveService.addorg(archive4);
                 archiveService.addorg(archive5);
 
+            }
+        }
+        return new JsonResult<>(ResultCode.SUCCESS,true);
+    }
+    @PostMapping("init")
+    @Transactional
+    public Object initfinal(@CookieValue("userid") String id){
+        int userid=Integer.parseInt(id);
+        int setid=setService.getsetid();
+        scorefinalService.deleteBy2id(userid,setid);
+        List<Index> index3s=index1Service.get3All();
+        List<Country> countries=countryService.getAll();
+        for(Country country:countries){
+            for(Index index:index3s){
+                List<Score> scoreList=scoremanService.getAllbycisid(country.getId(),index.getId(),setid);
+                if(scoreList.size()==0){
+                    Score score1=new Score();
+                    score1.setSetid(setid);
+                    score1.setScore(0);
+                    score1.setIsscored(0);
+                    score1.setIndex3id(index.getId());
+                    score1.setUserid(userid);
+                    score1.setCounid(country.getId());
+                    scorefinalService.InsertScore(score1);
+                }else {
+                    float temp=scoreList.get(0).getScore();
+                    //flag置1表示有冲突
+                    int flag=0;
+                    for(Score ss:scoreList){
+                        if(temp==ss.getScore()) continue;
+                        flag=1;
+                    }
+                    Score score2=new Score();
+                    score2.setSetid(setid);
+                    score2.setIndex3id(index.getId());
+                    score2.setUserid(userid);
+                    score2.setCounid(country.getId());
+                    if(flag==1){
+                        score2.setScore(0);
+                        score2.setIsscored(0);
+                    }else{
+                        score2.setIsscored(1);
+                        score2.setScore(temp);
+                    }
+                    scorefinalService.InsertScore(score2);
+
+                }
             }
         }
         return new JsonResult<>(ResultCode.SUCCESS,true);

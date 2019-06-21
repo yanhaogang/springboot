@@ -7,9 +7,6 @@ import java.util.List;
 
 public interface ScorefinalMapper {
 
-    @Insert("INSERT INTO score_final(coun_id,index3_id,set_id,score,is_scored,user_id) VALUES(#{counid},#{index3id},#{setid},#{score},#{isscord},#{userid})")
-    @Options(useGeneratedKeys=true,keyProperty = "id")
-    int insert(Score scorefinal);
 
     @Select("SELECT * FROM score_final")
     @Results({
@@ -39,5 +36,9 @@ public interface ScorefinalMapper {
 
     @Update("update score_final set score=#{arg0},is_scored=1 where coun_id=#{arg1} and index3_id=#{arg2} and set_id=#{arg3} and user_id=#{arg4}")
     void updataScore(float arg0,int arg1,int arg2,int arg3,int arg4);
+    @Select("select * from score_final where user_id=#{arg0} and set_id=#{arg1}")
+    List<Score> getAllBy2id(int arg0,int arg1);
 
+    @Delete("delete from score_final where user_id=#{arg0} and set_id=#{arg1}")
+    void deleteBy2id(int arg0,int arg1);
 }
