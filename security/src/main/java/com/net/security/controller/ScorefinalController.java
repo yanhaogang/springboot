@@ -21,8 +21,6 @@ public class ScorefinalController {
     @Autowired
     private CountryService countryService;
     @Autowired
-    private ScoreautoService scoreautoService;
-    @Autowired
     private ScoremanService scoremanService;
     @Autowired
     private Index1Service index1Service;
@@ -192,11 +190,13 @@ public class ScorefinalController {
                 }
                 if (flag == 0) {
                     detail.setIndex(index1Service.get3nameByid(n));
+                    detail.setIndexname(index1Service.get3nicknameByid(n));
                     detail.setStatus("一致");
                     detail.setDetail(linshi.toString());
                     detail.setScore(temp);
                 } else {
                     detail.setIndex(index1Service.get3nameByid(n));
+                    detail.setIndexname(index1Service.get3nicknameByid(n));
                     detail.setStatus("冲突");
                     detail.setDetail(linshi.toString());
                     detail.setScore(0);
@@ -236,10 +236,13 @@ public class ScorefinalController {
         return new JsonResult<>(ResultCode.SUCCESS,classhelps);
     }
     @PostMapping("archive")
+    @Transactional
     public Object dataprocess(@CookieValue("userid") String id){
         List<Country> countrys;
         int counid;
         int setid=setService.getsetid();
+        archiveService.deleteCounBysetid(setid);
+        archiveService.deleteOrgBysetid(setid);
         HashSet<String> cnentset=new HashSet<>();
         List<Score> scores;
         List<Finalscore> finalscores=new ArrayList<>();

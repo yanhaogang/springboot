@@ -36,6 +36,9 @@ public interface Index1Mapper {
     @Select("select name from index_three where id=#{id}")
     String get3namebyid(int id);
 
+    @Select("select nickname from index_three where id=#{id}")
+    String get3nicknameByid(int id);
+
     @Select("select * from index_two where parent=#{parent}")
     List<Index> get2Allbyparent(int parent);
     @Select("select * from index_three where parent=#{parent}")

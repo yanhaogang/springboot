@@ -50,5 +50,6 @@ public interface Index1Service {
     void delete1byid(int id);
     void insert1(Index1 index1);
     void update1(String arg0,String arg1,Float arg2,String arg3,Integer arg4);
+    String get3nicknameByid(int id);
 
 }

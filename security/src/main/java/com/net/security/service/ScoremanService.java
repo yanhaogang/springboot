@@ -13,4 +13,6 @@ public interface ScoremanService {
     Integer getScoreBy4id(int arg0,int arg1,int arg2,int arg3);
     List<Score> getAllbycisid(int arg0,int arg1,int arg2);
     void updataScore(float arg0,int arg1,int arg2,int arg3,int arg4);
+
+    List<Score> getAllBy2id(int arg0,int arg1);
 }

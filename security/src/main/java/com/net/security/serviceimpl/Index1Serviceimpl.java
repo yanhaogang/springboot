@@ -30,6 +30,11 @@ public class Index1Serviceimpl implements Index1Service {
     }
 
     @Override
+    public String get3nicknameByid(int id) {
+        return index1Mapper.get3nicknameByid(id);
+    }
+
+    @Override
     public List<Index> getPart3Bylike(String arg0, int arg1, int arg2) {
         return index1Mapper.getPart3Bylike(arg0,arg1,arg2);
     }

@@ -22,4 +22,9 @@ public class ScoreautoServiceimpl implements ScoreautoService {
     public void insert(Scoreauto scoreauto) {
         scoreautoMapper.insert(scoreauto);
     }
+
+    @Override
+    public List<Scoreauto> getAllBysetid(int setid) {
+        return scoreautoMapper.getAllBysetid(setid);
+    }
 }

@@ -3,8 +3,8 @@ package com.net.security.controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.net.security.bean.*;
+import com.net.security.bean.Set;
 import com.net.security.service.*;
-import com.net.security.utils.FloatSolve;
 import com.net.security.utils.JsonResult;
 import com.net.security.utils.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +22,11 @@ public class GetapiController {
     @Autowired
     private OrgService orgService;
     @Autowired
-    private ScorefinalService scorefinalService;
-    @Autowired
     private Index1Service index1Service;
     @Autowired
     private SetService setService;
     @Autowired
-    private CtooService ctooService;
-    private Finalscore finalscore;
-
+    private ArchiveService archiveService;
     @GetMapping("countries")
     public Object countrytocon(){
 
@@ -60,140 +56,70 @@ public class GetapiController {
     }
 
     @GetMapping("scores")
-    public Object finalscores(@CookieValue("userid") String userid){
-        List<Country> countrys;
-        int counid;
+    public Object finalscores(){
         int setid=setService.getsetid();
-        HashSet<String> cnentset=new HashSet<>();
-        List<Score> scores;
         List<Finalscore> finalscores=new ArrayList<>();
-        float score=0;
-        countrys=countryService.getAll();
-        for(Country ct:countrys){
-            cnentset.add(ct.getContinent());
-            //二级指标对应的分数
-            LinkedHashMap<Integer,Float> hashMap2=new LinkedHashMap<>();
-            //一级指标对应的分数
-            LinkedHashMap<Integer,Float> hashMap1=new LinkedHashMap<>();
-            finalscore=new Finalscore();
-            finalscore.setCountry(ct.getName());
-            finalscore.setContinent(ct.getContinent());
-            counid=ct.getId();
-            scores=scorefinalService.getAllbycounid(counid,Integer.parseInt(userid),setid);
-            for(Score score1:scores){
-                Index index=  index1Service.get3byid(score1.getIndex3id());
-                if(hashMap2.containsKey(index.getParent())){
-                    float ind=hashMap2.get(index.getParent());
-                    hashMap2.put(index.getParent(),ind+index.getWeight()* score1.getScore());
-                }else {
-                    hashMap2.put(index.getParent(), index.getWeight() * score1.getScore());
-                }
-
+        List<Archive> archives=archiveService.getAll1Bysetid(setid);
+        List<Country> countries=countryService.getAll();
+        HashMap<String,String> cnameToContinent=new HashMap<>();
+        HashSet<String> counsets=new HashSet<>();
+        for(Country country:countries){
+            cnameToContinent.put(country.getName(),country.getContinent());
+        }
+        for(Archive archive1:archives){
+            counsets.add(archive1.getMainname());
+        }
+        for(String c:counsets){
+            List<Archive> archiveList=archiveService.getcBy2(c,setid);
+            Finalscore finalscore=new Finalscore();
+            for(Archive archive:archiveList){
+                finalscore.setCountry(c);
+                finalscore.setContinent(cnameToContinent.get(c));
+                if(archive.getIndex1id()==-1) finalscore.setScore(archive.getScore());
+                if(archive.getIndex1id()==1) finalscore.setStrategy(archive.getScore());
+                if(archive.getIndex1id()==2) finalscore.setTechnical(archive.getScore());
+                if(archive.getIndex1id()==3) finalscore.setIndustry(archive.getScore());
+                if(archive.getIndex1id()==4) finalscore.setCapacity(archive.getScore());
+                if(archive.getIndex1id()==5) finalscore.setResources(archive.getScore());
             }
-            for(Map.Entry<Integer,Float> entry:hashMap2.entrySet()){
-                Index index2=index1Service.get2byid(entry.getKey());
-
-                if(hashMap1.containsKey(index2.getParent())){
-                    float ind1=hashMap1.get(index2.getParent());
-                    hashMap1.put(index2.getParent(),new FloatSolve().transfloat(ind1+index2.getWeight()*entry.getValue()));
-                }else {
-                    hashMap1.put(index2.getParent(), new FloatSolve().transfloat(index2.getWeight() * entry.getValue()));
-                }
-            }
-
-            score=0;
-            for(Map.Entry<Integer,Float> entry1:hashMap1.entrySet()){
-                Index index1=index1Service.get1byid(entry1.getKey());
-                if(index1.getName().equals("strategy")) finalscore.setStrategy(entry1.getValue());
-                if(index1.getName().equals("technical")) finalscore.setTechnical(entry1.getValue());
-                if(index1.getName().equals("industry")) finalscore.setIndustry(entry1.getValue());
-                if(index1.getName().equals("capacity")) finalscore.setCapacity(entry1.getValue());
-                if(index1.getName().equals("resources")) finalscore.setResources(entry1.getValue());
-                score+=index1.getWeight()*entry1.getValue();
-            }
-            finalscore.setScore(new FloatSolve().transfloat(score));
             finalscores.add(finalscore);
-            
         }
-        List<Finalscore> totallists=new ArrayList<>();
-        for(String s:cnentset){
-            Finalscore cnent=new Finalscore();
-            cnent.setCountry(s);
-            cnent.setContinent(s);
-            float finalscore=0,finallegal=0,finaltech=0,finalorg=0,finalcap=0,finalcoo=0;
-            int count=0;
-            for(Finalscore f:finalscores){
-                if((f.getContinent()).equals(s)){
-                    finalscore+=f.getScore();
-                    finallegal+=f.getStrategy();
-                    finaltech+=f.getTechnical();
-                    finalorg+=f.getIndustry();
-                    finalcap+=f.getCapacity();
-                    finalcoo+=f.getResources();
-                    count++;
+        List<Archive> archs=archiveService.getAll2Bysetid(setid);
+        HashSet<String> orgsets=new HashSet<>();
+        HashMap<String,String> orgToType=new HashMap<>();
+        List<Org> orgList=orgService.getAll();
+        for(Org org:orgList){
+            orgToType.put(org.getName(),org.getType());
+        }
+        for(Archive aa:archs){
+            orgsets.add(aa.getMainname());
+        }
+        for(String s:orgsets){
+            List<Archive> archives1=archiveService.getoBy2(s,setid);
+            Finalscore finalscore=new Finalscore();
+            for(Archive aa:archives1){
+                if(aa.getMainid()==-1){
+                    finalscore.setCountry(s);
+                    finalscore.setContinent("大洲");
+                }else {
+                    finalscore.setCountry(s);
+                    finalscore.setContinent(orgToType.get(s));
                 }
+                if(aa.getIndex1id()==-1) finalscore.setScore(aa.getScore());
+                if(aa.getIndex1id()==1) finalscore.setStrategy(aa.getScore());
+                if(aa.getIndex1id()==2) finalscore.setTechnical(aa.getScore());
+                if(aa.getIndex1id()==3) finalscore.setIndustry(aa.getScore());
+                if(aa.getIndex1id()==4) finalscore.setCapacity(aa.getScore());
+                if(aa.getIndex1id()==5) finalscore.setResources(aa.getScore());
             }
-            cnent.setScore(new FloatSolve().transfloat(finalscore/count));
-            cnent.setStrategy(new FloatSolve().transfloat(finallegal/count));
-            cnent.setTechnical(new FloatSolve().transfloat(finaltech/count));
-            cnent.setIndustry(new FloatSolve().transfloat(finalorg/count));
-            cnent.setCapacity(new FloatSolve().transfloat(finalcap/count));
-            cnent.setResources(new FloatSolve().transfloat(finalcoo/count));
-            totallists.add(cnent);
+            finalscores.add(finalscore);
         }
-        List<Org> orglist=orgService.getAll();
-        for(Org org:orglist){
-            Finalscore orgg=new Finalscore();
-            orgg.setCountry(org.getName());
-            orgg.setContinent(org.getType());
-            List<String> couns=ctooService.getAllcByoid(org.getId());
-            HashSet<String> hashSet=new HashSet<>();
-            for(String a:couns){
-                hashSet.add(a);
-            }
-            float finalscore1=0,finallegal1=0,finaltech1=0,finalorg1=0,finalcap1=0,finalcoo1=0;
-            int count1=0;
-            for(Finalscore ff:finalscores){
-                if(hashSet.contains(ff.getCountry())){
-                    count1++;
-                    finalscore1+=ff.getScore();
-                    finallegal1+=ff.getStrategy();
-                    finaltech1+=ff.getTechnical();
-                    finalorg1+=ff.getIndustry();
-                    finalcap1+=ff.getCapacity();
-                    finalcoo1+=ff.getResources();
-                }
-            }
-            if(count1!=0) {
-                orgg.setScore(new FloatSolve().transfloat(finalscore1 / count1));
-                orgg.setStrategy(new FloatSolve().transfloat(finallegal1 / count1));
-                orgg.setTechnical(new FloatSolve().transfloat(finaltech1 / count1));
-                orgg.setIndustry(new FloatSolve().transfloat(finalorg1 / count1));
-                orgg.setCapacity(new FloatSolve().transfloat(finalcap1 / count1));
-                orgg.setResources(new FloatSolve().transfloat(finalcoo1 / count1));
-                totallists.add(orgg);
-            }else {
-                orgg.setScore(0);
-                orgg.setStrategy(0);
-                orgg.setTechnical(0);
-                orgg.setIndustry(0);
-                orgg.setCapacity(0);
-                orgg.setResources(0);
-                totallists.add(orgg);
-            }
-
-        }
-        HashMap<String,List<Finalscore>> map =new HashMap<>();
-
-        map.put("countries",finalscores);
-        map.put("orgs",totallists);
-        return new JsonResult<>(ResultCode.SUCCESS, map);
+    return new JsonResult<>(ResultCode.SUCCESS,finalscores);
     }
 
-    //index三张表，国家名对应中英文
+    //index三张表，国家名及组织名对应中英文
     @GetMapping("dname")
     public Object entochinese(){
-        Gson gson=new GsonBuilder().enableComplexMapKeySerialization().create();
         LinkedHashMap<String,String> etocmap=new LinkedHashMap<>();
         List<Index> list1,list2,list3;
         list1=index1Service.get1All();
@@ -211,6 +137,10 @@ public class GetapiController {
         List<Country> list=countryService.getAll();
         for(Country country:list){
             etocmap.put(country.getName(),country.getNickname());
+        }
+        List<Org> orgList=orgService.getAll();
+        for(Org org:orgList){
+            etocmap.put(org.getName(),org.getNickname());
         }
         return new JsonResult<>(ResultCode.SUCCESS,etocmap);
 
@@ -243,9 +173,34 @@ public class GetapiController {
 
         return new JsonResult<>(ResultCode.SUCCESS,fitose);
     }
-    @GetMapping("scoreorgs")
-    public Object getScoreorgs(){
-        return null;
+
+    @PostMapping("line")
+    public Object getline(@RequestBody Inputline inputline){
+        String index=inputline.getIndex();
+        List<Index> index1s=index1Service.get1All();
+        HashMap<String,Integer> indexnToid=new HashMap<>();
+        for(Index in:index1s){
+            indexnToid.put(in.getName(),in.getId());
+        }
+        indexnToid.put("score",-1);
+        List<String> countryList=inputline.getCountries();
+        List<HashMap<String,Object>> finallist=new ArrayList<>();
+        List<Set> setList=setService.getAllset();
+        int index1id=indexnToid.get(index);
+        for(Set set:setList){
+            HashMap<String,Object> map=new HashMap<>();
+            map.put("sets",set.getName());
+            for(String c:countryList){
+                if(archiveService.getBy3(set.getId(),c,index1id)==null){
+                    map.put(c,"无评分");
+                }else {
+                    map.put(c, archiveService.getBy3(set.getId(), c, index1id).getScore());
+                }
+            }
+            finallist.add(map);
+        }
+        return new JsonResult<>(ResultCode.SUCCESS,finallist);
+
     }
 
 

@@ -38,4 +38,14 @@ public interface ScoremanMapper {
 
     @Update("update score_man  set score=#{arg0},is_scored=1 where coun_id=#{arg1} and index3_id=#{arg2} and set_id=#{arg3} and user_id=#{arg4}")
     void updataScore(float arg0,int arg1,int arg2,int arg3,int arg4);
+
+    @Select("select * from score_man where user_id=#{arg0} and set_id=#{arg1}")
+    @Results({
+            @Result(column = "coun_id",property = "counid"),
+            @Result(column = "index3_id",property = "index3id"),
+            @Result(column = "set_id",property = "setid"),
+            @Result(column = "is_scored",property = "isscored"),
+            @Result(column = "user_id",property = "userid")
+    })
+    List<Score> getAllBy2id(int arg0,int arg1);
 }

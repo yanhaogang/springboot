@@ -2,9 +2,18 @@ package com.net.security.bean;
 
 public class Detail {
     private String index;
+    private String indexname;
     private String status;
     private String detail;
     private float score;
+
+    public String getIndexname() {
+        return indexname;
+    }
+
+    public void setIndexname(String indexname) {
+        this.indexname = indexname;
+    }
 
     public String getIndex() {
         return index;

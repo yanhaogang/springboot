@@ -32,8 +32,21 @@ public class ScoringController {
 
 
     @GetMapping("data")
-    public Object finddata(){
-        int userid=1,setid=setService.getsetid();
+    public Object finddata(@CookieValue("userid") String id){
+        int userid=Integer.parseInt(id),setid=setService.getsetid();
+        if(scoremanService.getAllBy2id(userid,setid).size()==0){
+            List<Scoreauto> scoreautos=scoreautoService.getAllBysetid(setid);
+            for(Scoreauto scoreauto:scoreautos){
+                Score score1=new Score();
+                score1.setUserid(userid);
+                score1.setIsscored(0);
+                score1.setCounid(scoreauto.getCounid());
+                score1.setIndex3id(scoreauto.getIndex3id());
+                score1.setSetid(setid);
+                score1.setScore(scoreauto.getScore());
+                scoremanService.insertscoreman(score1);
+            }
+        }
         List<Index> first=new ArrayList<>();
         LinkedHashMap<Integer,List<Integer>> fitothird=new LinkedHashMap<>();
         first=index1Service.get1All();
@@ -91,8 +104,8 @@ public class ScoringController {
 
     @PostMapping("undo")
     @Transactional
-    public JsonResult delete(@RequestBody Deindex deindex){
-        int userid=1;
+    public JsonResult delete(@RequestBody Deindex deindex,@CookieValue("userid") String uid){
+        int userid=Integer.parseInt(uid);
         int counid=countryService.getidbyname(deindex.getCountry());
         List<Integer> index2=index1Service.get2idbyparent(index1Service.get1idByname(deindex.getIndex()));
         List<Integer> index3id=new ArrayList<>();
@@ -145,21 +158,16 @@ public class ScoringController {
             List<Country> countryList=countryService.getAll();
             for(Index ind:index3list){
                 for(Country country:countryList){
-                    if(referenceService.getBycandi(country.getNickname(),ind.getName())==null){
-                        Scoreauto scoreauto=new Scoreauto();
-                        scoreauto.setCounid(country.getId());
-                        scoreauto.setIndex3id(ind.getId());
-                        scoreauto.setSetid(setid);
+                    Scoreauto scoreauto=new Scoreauto();
+                    scoreauto.setCounid(country.getId());
+                    scoreauto.setIndex3id(ind.getId());
+                    scoreauto.setSetid(setid);
+                    if((referenceService.getBycandi(country.getNickname(),ind.getName()).size())==0){
                         scoreauto.setScore(0);
-                        scoreautoService.insert(scoreauto);
                     }else{
-                        Scoreauto scoreauto=new Scoreauto();
-                        scoreauto.setCounid(country.getId());
-                        scoreauto.setIndex3id(ind.getId());
-                        scoreauto.setSetid(setid);
                         scoreauto.setScore(1);
-                        scoreautoService.insert(scoreauto);
                     }
+                    scoreautoService.insert(scoreauto);
                 }
             }
 
@@ -185,7 +193,6 @@ public class ScoringController {
      */
     @GetMapping("sets")
     public JsonResult getAllset(@RequestParam Integer start, Integer limit, String search){
-        System.out.println(search.length());
         if(search.length()>0){
             Integer c0=setService.getNumBysearch(search);
             Sets sets0=new Sets();

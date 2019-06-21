@@ -47,6 +47,7 @@ public class UserController {
             }else {
                 int id=userService.getBynp(name,password).getId();
                 Cookie cookie=new Cookie("userid",String.valueOf(id));
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 cookie.setMaxAge(60*60*24);
                 Returnuser returnuser=new Returnuser();

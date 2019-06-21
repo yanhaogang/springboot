@@ -52,4 +52,9 @@ public class ScoremanServiceimpl implements ScoremanService {
     public Integer getScoreBy4id(int arg0, int arg1, int arg2, int arg3) {
         return scoremanMapper.getScoreBy4id(arg0,arg1,arg2,arg3);
     }
+
+    @Override
+    public List<Score> getAllBy2id(int arg0, int arg1) {
+        return scoremanMapper.getAllBy2id(arg0,arg1);
+    }
 }

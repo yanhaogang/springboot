@@ -61,7 +61,8 @@ public class SetServiceimpl implements SetService {
 
     @Override
     public int insert(Set set) {
-        return setMapper.insert(set);
+         setMapper.insert(set);
+         return set.getId();
 
     }
 
