@@ -28,7 +28,7 @@ public interface CountryService {
     List<Country> getAllBylike(String _parameter);
     void insert(Country country);
     void update(String arg0, String arg1, Date arg2, String arg3, String arg4, Float arg5, Float arg6, String arg7, String arg8, String arg9, int arg10);
-
+    String getNickByname(String name);
 
 
 

@@ -76,10 +76,14 @@ public class ScoringController {
                     map.put(index.getName(),"no");
                 }else{
                     for(Integer num:ontthree){
-                        if(scoremanService.getIsscorcedBy4id(num,ct.getId(),userid,setid)!=1){
-                            int nouse=0;
-                            flag = 1;
-                            break;
+                        if(scoremanService.getIsscorcedBy4id(num,ct.getId(),userid,setid)==null){
+                            return new JsonResult<>(ResultCode.SUCCESS,map);
+                        }else {
+                            if (scoremanService.getIsscorcedBy4id(num, ct.getId(), userid, setid) != 1) {
+                                int nouse = 0;
+                                flag = 1;
+                                break;
+                            }
                         }
                     }
 

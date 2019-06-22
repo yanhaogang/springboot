@@ -1,13 +1,11 @@
 package com.net.security.controller;
 
 import com.net.security.bean.Score;
-import com.net.security.service.CtooService;
-import com.net.security.service.Index1Service;
-import com.net.security.service.ScoremanService;
-import com.net.security.service.SetService;
+import com.net.security.service.*;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +27,8 @@ public class TestController {
     private SetService setService;
     @Autowired
     private CtooService ctooService;
+    @Autowired
+    private ScorefinalService scorefinalService;
     @GetMapping("/")
     public String test(){
         return "hello";
@@ -81,6 +81,19 @@ public class TestController {
         String password="zz";
         RedisProperties.Jedis jedis=new RedisProperties.Jedis();
         return null;
+    }
+    @GetMapping("testaddScorefinal")
+    @Transactional
+    public Object insert1(){
+        Score score1=new Score();
+        score1.setSetid(-1);
+        score1.setScore(-1);
+        score1.setIsscored(-1);
+        score1.setIndex3id(-1);
+        score1.setUserid(-1);
+        score1.setCounid(-1);
+        scorefinalService.InsertScore(score1);
+        return true;
     }
 
 

@@ -16,4 +16,14 @@ public class ReferenceServiceimpl implements ReferenceService {
     public List<Reference> getBycandi(String arg0, String arg1) {
         return referenceMapper.getBycandi(arg0,arg1);
     }
+
+    @Override
+    public void delByid(int id) {
+        referenceMapper.delByid(id);
+    }
+
+    @Override
+    public void insert(Reference reference) {
+        referenceMapper.insert(reference);
+    }
 }

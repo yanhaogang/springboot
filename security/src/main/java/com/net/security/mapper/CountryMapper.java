@@ -46,4 +46,8 @@ public interface CountryMapper {
     void insert(Country country);
     @Update("update country set name=#{arg0},nickname=#{arg1},est=#{arg2},language=#{arg3},capital=#{arg4},population=#{arg5},area=#{arg6},economy=#{arg7},other=#{arg8},continent=#{arg9} where id=#{arg10}")
     void update(String arg0,String arg1,Date arg2,String arg3,String arg4,Float arg5,Float arg6,String arg7,String arg8,String arg9,int arg10);
+
+    @Select("select nickname from country where name=#{name}")
+    String getNickByname(String name);
+
 }

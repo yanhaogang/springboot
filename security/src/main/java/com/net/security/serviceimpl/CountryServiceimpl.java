@@ -48,6 +48,11 @@ public class CountryServiceimpl implements CountryService {
     }
 
     @Override
+    public String getNickByname(String name) {
+        return countryMapper.getNickByname(name);
+    }
+
+    @Override
     public int getidbyname(String name) {
         return countryMapper.getIdbyName(name);
     }

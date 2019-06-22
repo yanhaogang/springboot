@@ -79,31 +79,31 @@ public class ScorefinalController {
     @GetMapping("status")
     public Object getAllstatus(){
         int flag=0;
+        int setid=setService.getsetid();
         List<Country> countries=countryService.getAll();
         List<Index> index3=index1Service.get3All();
-        List<LinkedHashMap<String,Object>> result=new ArrayList<>();
+        List<HashMap<String,Object>> result=new ArrayList<>();
         for(Country ct:countries){
-            LinkedHashMap<String,Object> map=new LinkedHashMap<>();
+            HashMap<String,Object> map=new HashMap<>();
             map.put("country",ct.getName());
             for(Index id3:index3){
-                List<Score> scoreList=scoremanService.getAllbycisid(ct.getId(),id3.getId(),setService.getsetid());
-                //如果该指标没有评过分，则认为该指标无冲突
+                List<Score> scoreList=scoremanService.getAllbycisid(ct.getId(),id3.getId(),setid);
+                //如果该指标没有评过分，则认为该指标无冲突，无冲突是0，有冲突是1
                 if(scoreList!=null&&scoreList.size()!=0){
                     float temp = scoreList.get(0).getScore();
                     flag = 0;
                     for (Score ss : scoreList) {
-                        if (temp != ss.getScore()) {
-                            map.put(id3.getName(), 1);
-                            flag = 1;
-                            break;
-                        }
+                        if (temp == ss.getScore()) continue;
+                        flag=1;
                     }
                     if (flag == 0) {
                         map.put(id3.getName(), 0);
+                    }else {
+                        map.put(id3.getName(),1);
                     }
 
                 }else {
-                    map.put(id3.getName(),1);
+                    map.put(id3.getName(),0);
                 }
             }
             result.add(map);
@@ -132,6 +132,7 @@ public class ScorefinalController {
         List<LinkedHashMap<String, Object>> scorefinalmap = new ArrayList<>();
         for (Country ct : countries) {
             LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            //flag1为1表示关于该审核员有审核记录
             for (Index i : index1) {
                 //flag为1表示某一大指标没有评分
                 int flag = 0;
@@ -140,9 +141,13 @@ public class ScorefinalController {
                     map.put(i.getName(), "no");
                 } else {
                     for (Integer n : threeofone) {
-                        if(scorefinalService.getIsscorcedBy4id(n,ct.getId(),userid,setid)!=1){
-                            flag=1;
-                            break;
+                        if(scorefinalService.getIsscorcedBy4id(n,ct.getId(),userid,setid)==null){
+                            return new JsonResult<>(ResultCode.SUCCESS,scorefinalmap);
+                        }else {
+                            if (scorefinalService.getIsscorcedBy4id(n, ct.getId(), userid, setid) != 1) {
+                                flag = 1;
+                                break;
+                            }
                         }
                     }
                 }
@@ -152,6 +157,7 @@ public class ScorefinalController {
                     map.put(i.getName(), "yes");
                 }
             }
+
             map.put("country", ct.getName());
             List<Score> scores = scorefinalService.getAllbycounid(ct.getId(), userid, setid);
             for (Score s : scores) {
@@ -584,6 +590,28 @@ public class ScorefinalController {
                 }
             }
         }
+        return new JsonResult<>(ResultCode.SUCCESS,true);
+    }
+    @GetMapping("delreference")
+    @Transactional
+    public Object delreferenceByid(@RequestParam Integer id){
+        referenceService.delByid(id);
+        return new JsonResult<>(ResultCode.SUCCESS,true);
+    }
+
+    @PostMapping("addreference")
+    @Transactional
+    public Object addre(@RequestParam String country,String index3 ,@RequestBody Content con){
+        String nickname=countryService.getNickByname(country);
+        Reference reference=new Reference();
+        reference.setContent("");
+        reference.setCountry(nickname);
+        reference.setIndex3(index3);
+        reference.setContentcn(con.getContent());
+        reference.setMessage("");
+        reference.setMessagecn("");
+        reference.setUrl("");
+        referenceService.insert(reference);
         return new JsonResult<>(ResultCode.SUCCESS,true);
     }
 

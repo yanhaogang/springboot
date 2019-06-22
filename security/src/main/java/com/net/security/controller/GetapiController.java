@@ -84,6 +84,7 @@ public class GetapiController {
             }
             finalscores.add(finalscore);
         }
+        List<Finalscore> totallist=new ArrayList<>();
         List<Archive> archs=archiveService.getAll2Bysetid(setid);
         HashSet<String> orgsets=new HashSet<>();
         HashMap<String,String> orgToType=new HashMap<>();
@@ -112,9 +113,12 @@ public class GetapiController {
                 if(aa.getIndex1id()==4) finalscore.setCapacity(aa.getScore());
                 if(aa.getIndex1id()==5) finalscore.setResources(aa.getScore());
             }
-            finalscores.add(finalscore);
+            totallist.add(finalscore);
         }
-    return new JsonResult<>(ResultCode.SUCCESS,finalscores);
+        HashMap<String,List<Finalscore>> hashMap=new HashMap<>();
+        hashMap.put("countries",finalscores);
+        hashMap.put("orgs",totallist);
+    return new JsonResult<>(ResultCode.SUCCESS,hashMap);
     }
 
     //index三张表，国家名及组织名对应中英文
